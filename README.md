@@ -5,7 +5,7 @@ A thin, well-typed Python client for the Synthik Labs backend.
 ## Install (editable from repo)
 
 ```bash
-pip install -e clients/python
+pip install synthik-client
 ```
 
 ## Usage
