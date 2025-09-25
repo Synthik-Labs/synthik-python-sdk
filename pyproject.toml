@@ -1,0 +1,29 @@
+[build-system]
+requires = ["hatchling>=1.25.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "synthik-client"
+version = "0.1.0"
+description = "Python client for Synthik Labs synthetic data generation API"
+readme = "README.md"
+license = { text = "MIT" }
+authors = [ { name = "Synthik Labs" } ]
+requires-python = ">=3.9"
+dependencies = [
+  "requests>=2.31.0",
+  "pydantic>=2.6.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/Synthik-Labs/synthik-backend"
+Repository = "https://github.com/Synthik-Labs/synthik-backend"
+
+[tool.hatch.build.targets.wheel]
+packages = ["synthik"]
+
+[tool.hatch.build.targets.sdist]
+include = [
+  "synthik/**",
+  "README.md",
+]
