@@ -42,3 +42,9 @@ jobs:
           fi
           git tag "v$VERSION" ${{ github.event.workflow_run.head_sha }}
           git push origin "v$VERSION"
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.ver.outputs.VERSION }}
+          generate_release_notes: true
