@@ -1,0 +1,44 @@
+name: Auto Tag on CI Success
+
+on:
+  workflow_run:
+    workflows: ["CI"]
+    types: [completed]
+
+jobs:
+  tag:
+    if: ${{ github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main' }}
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout commit from CI run
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Extract version from pyproject.toml
+        id: ver
+        shell: bash
+        run: |
+          VER=$(grep -Po '^[[:space:]]*version[[:space:]]*=[[:space:]]*"\K[^"]+' pyproject.toml | head -1)
+          if [ -z "$VER" ]; then
+            echo "Failed to extract version from pyproject.toml" >&2
+            exit 1
+          fi
+          echo "VERSION=$VER" >> "$GITHUB_OUTPUT"
+
+      - name: Create and push git tag
+        run: |
+          git fetch --tags --quiet
+          VERSION="${{ steps.ver.outputs.VERSION }}"
+          if [ -z "$VERSION" ]; then
+            echo "Version not found" >&2
+            exit 1
+          fi
+          if [ -n "$(git tag -l "v$VERSION")" ]; then
+            echo "Tag v$VERSION already exists. Skipping."
+            exit 0
+          fi
+          git tag "v$VERSION" ${{ github.event.workflow_run.head_sha }}
+          git push origin "v$VERSION"
